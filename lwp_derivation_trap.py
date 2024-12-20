@@ -1,3 +1,4 @@
+## add imports
 import iris,glob
 import numpy as np
 import iris.plot as iplt
@@ -8,8 +9,8 @@ import iris.plot as iplt
 
 
 
-
-path_m   = '/jet/home/nasch/cylc-run/u-dk832/share/data/History_Data/dk832a.pm2018sep'
+## select your path...I have some monthly output here
+path_m   = '/jet/home/nasch/cylc-run/u-dk881/share/data/History_Data/dk881a.pm2018sep'
 
 
 lwc_cubes = iris.cube.CubeList()
@@ -20,7 +21,7 @@ theta_cubes = iris.cube.CubeList()
 
 
 
-# m01s00i408
+## load in cubes
 list_of_files = [path_m]
 print(list_of_files)
 
@@ -47,6 +48,7 @@ timeseries_theta = theta_cubes.concatenate_cube()
 
 
 
+## this def allows variation in air pressure for our conversion to proper units for CDNC
 
 def get_air_density( air_pressure,potential_temperature):
   p0 = iris.coords.AuxCoord(1000.0,
@@ -73,7 +75,7 @@ def get_air_density( air_pressure,potential_temperature):
 
 [air_density, temperature] = get_air_density(timeseries_pressure, timeseries_theta)
 
-
+## I only really need air density
 
 
 
@@ -85,7 +87,7 @@ lwc.units = 'g m-3'
 lwc_arr = lwc.data
 height = np.array(lwc.coord('level_height').points)
 
-## implement the trapezoid rule to get liquid water path
+## implement the trapezoid rule to get liquid water path (numerical methods!)
 lwp = np.zeros([144,192])
 
 for j in range(144):
@@ -96,3 +98,5 @@ for j in range(144):
             trap_sum += trap
 
         lwp[j,k] = trap_sum
+
+np.save('lwp.npy', lwp)
